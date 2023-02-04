@@ -1,19 +1,29 @@
-#include<stdio.h>
-#include<stdlib.h>
-#include<unistd.h>  
-#include<pthread.h>
-void *myThreadFun(void *vargp)
+#include <stdio.h>
+#include <pthread.h> 
+#include <semaphore.h> 
+#include <unistd.h>
+sem_t mutex;
+void* thread(void* arg)
 {
-    sleep(1);
-    printf("Printing GeeksQuiz from Thread \n");
-    return NULL;
-} 
+//wait 
+sem_wait(&mutex); 
+printf("\nEntered..\n");
+//critical section 
+sleep(4);
+
+//signal
+printf("\nJust Exiting...\n"); 
+sem_post(&mutex);
+}
 int main()
 {
-    pthread_t thread_id;
-    printf("Before Thread\n");
-    pthread_create(&thread_id, NULL, myThreadFun, NULL);
-    pthread_join(thread_id, NULL);
-    printf("After Thread\n");
-    exit(0);
+sem_init(&mutex, 0, 1); 
+pthread_t t1,t2;
+pthread_create(&t1,NULL,thread,NULL); 
+sleep(2); 
+pthread_create(&t2,NULL,thread,NULL); 
+pthread_join(t1,NULL); 
+pthread_join(t2,NULL); 
+sem_destroy(&mutex);
+return 0;
 }
